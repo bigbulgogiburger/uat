@@ -1,0 +1,44 @@
+[
+  {
+    "id": "UAT3-01",
+    "round": 3,
+    "sev": "Critical",
+    "status": "open",
+    "area": "주문서 작성",
+    "title": "임시저장을 이어 쓴 주문서가 제출되지 않음 — 이어 쓰기가 앞 단계에서 확정한 배송지를 지움",
+    "tcs": ["D-12", "D-01"],
+    "found_by": ["order-2", "journey-1"],
+    "repro": "계정#1 → 주문서 2단계까지 입력 → 앱 종료 → 재실행 → 「주문하기」 → 「이어서 작성하기」 → 마지막 단계 → 「결제하기」",
+    "summary": "「이 내용으로는 주문할 수 없어요」 — 서버 요청 0건(sink·서버 로그) · DB 행 0",
+    "expected": "제출 성공 · 주문 내역 1건 추가(docs/spec/04_주문.md §5)",
+    "cause": "restoreDraft 가 선택값을 통째로 갈아 끼우면서 앞 단계에서 확정한 배송지를 null 로 덮는다(초안에는 배송지가 없다). 새로 쓰기 경로(reset)는 배송지를 남긴다 — 이어 쓰기만 이 축에서 빠짐. (코드 판독 — 메인 확인)",
+    "fix_hint": "이어 쓰기가 지금 확정된 배송지를 유지 · 실물 흐름 회귀 테스트(이어 쓰기 → 제출 선검증 통과) + 위반 주입",
+    "evidence": ["shots/D-12-submit-blocked.png", "out/order-2.jsonl D-12"],
+    "tracker": "SHOP-412",
+    "reopened_as": null,
+    "history": [{ "at": "2026-10-25T11:40:00", "status": "open", "note": "3차 측정 2회 재현 · 원인 판독" }]
+  },
+  {
+    "id": "UAT2-04",
+    "round": 2,
+    "sev": "Major",
+    "status": "reopened",
+    "area": "고객센터·약관",
+    "title": "캐시된 약관을 오프라인에서 다시 열면 오류 안내가 15초 뒤에야 뜸",
+    "tcs": ["H-07"],
+    "found_by": ["support-1"],
+    "repro": "약관 1회 열기 → 비행기 모드 → 약관 다시 열기",
+    "summary": "빈 화면으로 15초 대기 뒤 「연결을 확인해 주세요」(5회 중 4회)",
+    "expected": "즉시(수 초 안) 오류 안내와 「다시 시도」(docs/spec/08_설정.md §3)",
+    "cause": "추정 — 웹뷰가 캐시 엔트리로 연결을 시도하며 매달림. 실기 로그로 확인 필요",
+    "fix_hint": "진단 먼저(실기 logcat 의 실제 오류 문자열) → 해법 선택",
+    "evidence": ["out/r2-support.jsonl H-07", "out/support-1.jsonl H-07"],
+    "tracker": "SHOP-388",
+    "reopened_as": "UAT3-04",
+    "history": [
+      { "at": "2026-10-24T18:00:00", "status": "open" },
+      { "at": "2026-10-25T09:10:00", "status": "qa", "note": "SHOP-390 수정" },
+      { "at": "2026-10-25T11:50:00", "status": "reopened", "note": "3차에서 부분 재발 → UAT3-04" }
+    ]
+  }
+]

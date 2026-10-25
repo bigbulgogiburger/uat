@@ -1,0 +1,61 @@
+{
+  "skill_name": "uat",
+  "_fixtures": "평가 fixture(가상 쇼핑 앱 명세·코드·2차 실행 폴더)는 저장소 밖 작업 폴더의 make_fixtures.py 로 만든다. 각 실행은 자기 복사본(inputs/)에서만 작업한다.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "author-checklist-from-spec",
+      "prompt": "가상 쇼핑 앱 저장소가 {inputs}/shop 에 있어. 주문서 작성(04_주문.md) 영역의 UAT 1차 체크리스트를 만들어 줘. 다른 사람이 에뮬레이터에서 그대로 따라 하고 P/F 를 판정할 수 있어야 해. 결과는 {outputs} 에 tc.jsonl 과 사람이 읽을 체크리스트 md 로 남겨 줘. 앱·서버는 실행하지 마.",
+      "expected_output": "명세 근거(source)가 달린 TC jsonl + 체크리스트 md. 기대 결과는 명세에서(배송비 기준 3만 원), 코드와 명세 차이(코드 5만 원 · 이어 쓰기가 배송지를 지움)는 notes 에 결함 후보로. 이어서 작성하기 → 제출까지 가는 TC 포함.",
+      "files": ["fixtures/shop"],
+      "assertions": [
+        {"id": "a1-source", "text": "모든 TC 에 근거 문서(source)가 있다"},
+        {"id": "a1-fee-from-spec", "text": "배송비 무료 기준 TC 의 기대 결과가 명세값(3만 원)이다 — 코드값(5만 원)을 기대로 쓰지 않았다"},
+        {"id": "a1-mismatch-flagged", "text": "코드와 명세의 차이(배송비 기준 또는 이어 쓰기가 배송지를 지움)를 결함 후보로 적었다"},
+        {"id": "a1-resume-to-submit", "text": "「이어서 작성하기」로 시작해 제출(접수 완료)까지 가는 TC 가 있다"},
+        {"id": "a1-observable", "text": "기대 결과에 「정상 동작」·「적절히」 같은 관찰 불가능한 말이 없다"},
+        {"id": "a1-grades", "text": "TC 마다 등급(1·2·3)이 있고 핵심 여정(주문 제출)은 등급1 이다"},
+        {"id": "a1-exceptions", "text": "예외 경로 TC(배송지 없음·결제 수단 미선택·결제 실패 다시 시도·뒤로가기 중 2개 이상)가 있다"},
+        {"id": "a1-no-run", "text": "앱·서버를 실행하거나 fixture 코드를 수정하지 않았다"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "audit-round2-and-classify",
+      "prompt": "쇼핑앱 UAT 2차 측정이 끝났어. 실행 폴더는 {inputs}/runs/2026-01-12-uat2 이고 프로필은 {inputs}/runs/uat.config.json 이야(앱 저장소는 {inputs}/shop). 레인 판정을 감사해서 결함을 Critical/Major/Minor 로 분류하고 확정 결함 목록을 정리해 줘. 트래커 등록은 하지 말고 이슈 본문 초안만 {outputs}/issues/ 에 파일로, 2차 결과 보고서는 {outputs}/report.md 로 남겨 줘. 마지막에 나한테 할 짧은 보고도 {outputs}/summary.md 에 써 줘.",
+      "expected_output": "D-12(이어 쓰기 제출 불가)·E-05(연락처 노출)·D-04(금액 틀림)를 Critical 로 재판정, H-03 은 오판 의심으로 재측정, 1회 관측 부수(로그아웃)는 재확인 목록, 두 레인이 본 버튼 잘림은 한 결함(Minor)으로 확정, UAT1-01·02 는 고쳐짐(D-04 의 새 F 는 다른 결함), M-04 는 순서 필요 재측정, NO-GO.",
+      "files": ["fixtures/runs/2026-01-12-uat2", "fixtures/shop"],
+      "assertions": [
+        {"id": "a2-d12-critical", "text": "D-12(이어서 작성하기 후 제출 불가)를 Critical 로 분류했다"},
+        {"id": "a2-e05-critical", "text": "E-05(주문 상세 연락처 마스킹 없음)를 Critical 로 분류했다(개인정보 노출)"},
+        {"id": "a2-d04-up", "text": "D-04(3만 원 이상인데 배송비 부과 — 결제 금액 틀림)를 Minor 로 두지 않고 Major 이상으로 올렸다"},
+        {"id": "a2-d04-distinct", "text": "D-04 의 새 F 를 UAT1-02(띄어쓰기) 재발로 보지 않고 다른 결함으로 갈랐다(띄어쓰기는 고쳐짐)"},
+        {"id": "a2-h03-suspect", "text": "H-03(FAQ 「배송」 없음 — dump 만 보고 스크롤·스크린샷 없음)을 바로 확정하지 않고 재측정/오판 의심으로 돌렸다"},
+        {"id": "a2-side-recheck", "text": "1회만 관측된 로그아웃 부수 결함을 버리지도 바로 확정하지도 않고 재확인 대상으로 남겼다"},
+        {"id": "a2-side-merge", "text": "두 레인이 따로 본 「홈으로」 버튼 잘림을 한 결함으로 묶어 확정했다"},
+        {"id": "a2-fixed", "text": "UAT1-01(중복 주문)을 고쳐진 것으로 처리했다"},
+        {"id": "a2-weak-evidence", "text": "E-02 의 증거 「확인함」이 부실하다고 지적했다(재측정 또는 증거 보강)"},
+        {"id": "a2-m04-ordered", "text": "M-04(순서 필요 BLOCKED)를 다른 레인 뒤 재측정 대상으로 남겼다"},
+        {"id": "a2-nogo", "text": "보고서 판정이 NO-GO 이고 근거(미해결 Critical/Major)가 적혀 있다"},
+        {"id": "a2-cause", "text": "이어 쓰기 결함의 원인을 앱 코드(restoreDraft 가 배송지를 지움)에서 찾아 이슈 초안에 적었다"},
+        {"id": "a2-plain-summary", "text": "사용자 보고(summary.md)가 결함 ID 나열이 아니라 화면에서 무엇이 잘못되는지 쉬운 말로 시작한다"}
+      ]
+    },
+    {
+      "id": 3,
+      "name": "prepare-round3",
+      "prompt": "2차 결함 수정이 커밋 cccc333 에 다 들어갔어(내용은 {inputs}/fixes-round2.md). 감사가 끝난 2차 폴더는 {inputs}/runs/2026-01-12-uat2-audited, 프로필은 {inputs}/runs/uat.config.json 이야. 3차 UAT 를 돌릴 수 있게 회차 폴더와 레인 계획까지 준비해 줘. 측정 자체는 아직 하지 마. 준비한 것 목록은 {outputs}/prep.md 에 적어 줘.",
+      "expected_output": "3차 회차 폴더(2차 판정을 r2- 로 보존 · build cccc333) · changes.md(화면에서 무엇이 바뀌었나 · 승인 대기: 로그아웃 완료 화면 · 지난 회차 누적) · recheck.md(로그아웃 부수 결함 · M-04 순서 필요) · 재측정 레인 계획(등급1 전부 + 지난 F/BLOCKED + 결함 TC).",
+      "files": ["fixtures/runs/2026-01-12-uat2-audited", "fixtures/fixes-round2.md"],
+      "assertions": [
+        {"id": "a3-folder", "text": "3차 회차 폴더를 새로 만들었고 빌드 cccc333 을 기록했다(2차 폴더에 이어 쓰지 않았다)"},
+        {"id": "a3-prev-kept", "text": "2차 판정을 3차 폴더에 보존했다(r2- 접두 또는 동등한 방식)"},
+        {"id": "a3-changes", "text": "레인용 변경 문서(changes.md 등)에 고쳐진 동작을 화면 기준 문장으로 적었다"},
+        {"id": "a3-pending", "text": "결정 대기 항목(로그아웃 완료 화면)을 결함이 아니라 승인 대기로 다뤘다"},
+        {"id": "a3-recheck", "text": "TC 밖 부수 결함(로그아웃)과 M-04 를 재확인/순서 필요 목록에 넣었다"},
+        {"id": "a3-scope", "text": "재측정 범위가 등급1 전부와 지난 F·BLOCKED 를 포함한다(D-12·M-04·Z-01·X-04 포함)"},
+        {"id": "a3-no-measure", "text": "측정을 하지 않았고 판정 기록(P/F)을 새로 만들지 않았다"}
+      ]
+    }
+  ]
+}
