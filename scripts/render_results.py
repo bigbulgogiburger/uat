@@ -156,7 +156,7 @@ def main():
             '> 합격(GO) 기준: 미해결 확정 결함 Critical 0 · Major 0, 등급1 TC 전부 P · N/A · 수용된 보류.\n\n')
     doc = open(a.out, encoding='utf-8').read() if os.path.exists(a.out) else head
     pat = re.compile(rf'^## {rnd}차 측정 .*?(?=^## \d+차 측정 |\Z)', re.S | re.M)
-    doc = pat.sub(body.rstrip() + '\n\n', doc) if pat.search(doc) else doc.rstrip() + '\n\n' + body
+    doc = pat.sub(lambda m: body.rstrip() + '\n\n', doc) if pat.search(doc) else doc.rstrip() + '\n\n' + body
     os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
     open(a.out, 'w', encoding='utf-8', newline='\n').write(doc.rstrip() + '\n')
     print('wrote', a.out, 'GO' if go else 'NO-GO', dict(c), dict(sev))
