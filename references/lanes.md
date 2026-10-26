@@ -96,4 +96,5 @@ python $S/plan_lanes.py args --out RUN/lanes/workflow-args.json
 
 - **Agent 툴 순차 실행**: Workflow 툴이 없는 세션에서는 measure.js 의 `prompt()` 와 같은 내용을 Agent 툴에 넘겨 레인을 하나씩 돌린다. 반환은 JSON 텍스트로 받아 직접 파싱한다.
 - **Herdr pane 의 에이전트**: 다른 터미널의 에이전트(다른 모델·다른 CLI)를 레인으로 쓸 수 있다. 장점은 메인 세션 맥락을 쓰지 않는다는 것이다. 단점은 pane 하나에 0.5~0.7GB 메모리가 들고, 반환이 구조화돼 있지 않다는 것이다. 레인에게 "끝나면 결과를 파일로 쓰고 경로만 답하라"고 시킨다. 판정은 어느 실행기든 verdict.py 로만 남기므로 감사 절차는 같다.
+- **Workflow·Agent 툴이 둘 다 없는 세션(Codex CLI 등)**: `assets/workflows/*.js` 는 실행하지 않고 읽기만 한다. 각 레인의 `prompt()` 가 만드는 지시를 `workflow-args.json` 값으로 채워 메인이 레인을 하나씩 직접 수행하거나, 위 Herdr pane 레인에 넘긴다. args 의 모델·추론 강도 값은 그 실행기에 맞는 값으로 바꿔 읽는다.
 - 무엇으로 돌리든 **레인 보고를 믿지 말고 jsonl 로 대조한다.**

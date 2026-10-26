@@ -1,7 +1,7 @@
 ---
 name: uat
 description: 출시 전 인수 테스트(UAT)를 "실제 빌드를 실제로 조작해서" 재는 회차 루프. 명세 근거 체크리스트(TC) 작성 → 측정 환경(외부 발송 차단·비밀 격리·데이터 시드) → 에이전트 레인이 화면·API 를 직접 밟아 P/F/N/A/BLOCKED 를 jsonl 로 기록 → 판정 감사·부수 결함 재확인 → Critical/Major/Minor 분류와 원인 판독 → 결함 트래커 등록 → 수정 루프 → 같은 커밋으로 재빌드·재측정을 Critical·Major 0 이 될 때까지 반복한다. Android 에뮬레이터(adb)·웹 브라우저·API 를 같은 틀로 다룬다. "UAT 해줘", "UAT 돌려", "UAT 체크리스트 만들어줘", "인수 테스트", "출시 전 전수 점검", "QA 실측", "재측정", "2차/3차 UAT", "등급1 회귀", "결함 분류해서 Jira 에", "UAT 결과보고", "Critical·Major 0 까지 돌려", "에뮬레이터로 앱 전체 검증" 같은 말이 나오면 스킬 이름을 부르지 않아도 이 스킬을 쓴다. 단위 테스트는 전부 초록인데 실제로 쓰면 깨지는지 확인하고 싶을 때도 여기에 해당한다. 프로젝트 전용 UAT 스킬이 따로 있으면 그쪽을 우선한다.
-compatibility: Python 3.9+ · Node 20(Workflow 스크립트) · Claude Code Workflow/Agent 도구 · (Android) adb · (웹) 브라우저 자동화 MCP 중 하나 · (선택) 결함 트래커 MCP · (선택) Herdr
+compatibility: Python 3.9+ · Node 20(Workflow 스크립트) · Claude Code Workflow/Agent 도구(없는 실행기 — Codex 등 — 는 references/lanes.md §9) · (Android) adb · (웹) 브라우저 자동화 MCP 중 하나 · (선택) 결함 트래커 MCP · (선택) Herdr
 ---
 
 # UAT 회차 루프
